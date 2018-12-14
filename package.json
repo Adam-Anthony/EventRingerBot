@@ -1,0 +1,11 @@
+{
+	"name": "Event Ringer",
+	"version": "1.0.0",
+	"description": "Nudge those people in a roll who aren't in call on your server!",
+	"main": "bot.js",
+	"author": "Patches",
+	"dependencies": {
+		"discord.js": "^11.4.2",
+		"dotenv": "^6.2.0"
+	}
+}
