@@ -5,12 +5,9 @@ const prefix = '$';
 var dotenv = require('dotenv');
 dotenv.load();
 
-var hoster = null;
-var group = null;
-
-var server = null;
-var serverName = null;
 var membersList = null;
+
+var guildsMap = {};
 
 var active = false;
 
@@ -22,52 +19,56 @@ client.on('message', msg => {
     if (msg.author.bot) return;
     if (msg.deleted) return;
     if (msg.content[0] !== prefix) return;
-
+    if (msg.channel.type === 'dm') return;
 
 
     var rung = msg.content.slice(1);
 
-    if (/^ring +/i.test(rung) && (msg.channel.type === 'dm')) {
-    	var parts = rung.slice(5).trim();
+    if (/^setup +/i.test(rung)){
+        if (!msg.guild.member(msg.author).permissions.has('MANAGE_GUILD', true)) return;
+    	var roleTrgt = rung.slice(5).trim();
     	//.split( / ?\| ?/);
     	//console.log(parts);
-    	if (parts.length <= 1) {
+    	if (roleTrgt.length <= 1) {
     		console.log('forgot parameters.');
     		return;
     	}
-    	hoster = msg.author;
-    	group = parts;//.split(/ ?(?=@)/g);
-    	//channelName = parts[1];
-
+        var server = msg.guild;
+        //console.log(msg.guild);
+        //
+        var roleCall = Array.from(server.roles);
+        var match = false;
+        for (var i = roleCall.length - 1; i >= 0; i--) {
+            if (roleCall[i][1].name === roleTrgt){
+                match = true;
+                break;
+            }
+        }
+        if (match===false){
+            msg.reply('Can\'t find that role, sorry.');
+            return;
+        }
+        //
+        guildsMap[server.id] = roleTrgt;
     }
-    if (msg.channel.type === 'dm') return;
-    if (/^ring$/i.test(rung)){
-    	//client.reply(msg.author.id)
-    	if (msg.author.id === hoster.id){
-    		msg.guild.member(msg.author).permissions.has('MANAGE_GUILD', true);
 
-    		if (active){
-    			var targets = membersList.filter(val => val.voiceChannel === undefined);
-    			var callingList = Array.from(targets.values());
-    			for (var i = callingList.length - 1; i >= 0; i--) {
-    				if (!callingList[i].user.bot){
-    					callingList[i].send("Hey, wake up!");
+    if (rung === 'ring'){
+        var server = msg.guild; 
+    	if (guildsMap[server.id] != undefined){
+            //console.log('in guildsMap')
+    		if (server.member(msg.author).permissions.has('MANAGE_GUILD', true)){
+                console.log('Cleared author check.')
+                console.log(guildsMap[server.id]);
+                var membersList = Array.from(server.members.values());
+                var outacall = membersList.filter(val => val.voiceChannel == undefined);
+                var paging = outacall.filter(val => val.roles.find(rol => rol.name === guildsMap[server.id]));
+
+    			for (var i = paging.length - 1; i >= 0; i--) {
+    				if (!paging[i].user.bot){
+                        //console.log('paging: '+paging[i].user.username);
+    					paging[i].send(`Hey , wake up ${guildsMap[server.id]}! You are needed in ${server.name}`);
     				}
     			}
-    		}else{
-    			
-    			server = msg.guild;
-    			serverName = server.name;
-    			membersList = server.members.filter(val => val.roles.filter(rol => rol.name === group));
-    			var targets = membersList.filter(val => val.voiceChannel === undefined);
-    			var callingList = Array.from(targets.values());
-    			for (var i = callingList.length - 1; i >= 0; i--) {
-    				if (!callingList[i].user.bot){
-    					callingList[i].send("Hey, wake up!");
-    				}
-    			}
-    			active = true;
-
     		}
     	}
     }
