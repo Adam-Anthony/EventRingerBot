@@ -3,10 +3,10 @@
 A WIP attempt to make a bot the will dm anyone with a given role who isn't in the server's voice channels.
 Useful to get your team together when its time to go. Only for use by those with permissions to manage the server.
 
-Step 0: Direct message Event Caller with $ring @rolegoeshere
-There now you have initilized your ring. You won't have to do this again (unless the bot goes down)
-Step 1: just post '$ring' in the server and it will use the settings from before.
-Step 1a: Want to change up your settings? Just go and send a new message to the Event Caller bot.
+Step 0: $setup [group name without @]
+Step 1: $ring' in the server and it will ring the group you set early
+
+It will keep the group you named as it's calling group.
 
 
-Look forward to the sharing link soon!
+Add it to your server today! https://discordapp.com/oauth2/authorize?&client_id=523153917106978828&scope=bot&permissions=285584448
